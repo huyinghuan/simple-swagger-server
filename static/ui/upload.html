@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head></head>
+
+<body>
+    <input type="file" id="file" name="file" />
+    <a href="/">回首页</a>
+    <script>
+        var file = document.getElementById("file");
+        file.onchange = function () {
+            var fileObj = file.files[0];
+            var url = "/api/upload";
+            var form = new FormData();
+            form.append("file", fileObj);
+            var xhr = new XMLHttpRequest();
+            xhr.open("post", url, true);
+            xhr.onload = function () {
+                alert(xhr.responseText);
+            };
+            xhr.send(form);
+        };
+    </script>
+</body>
+
+</html>
