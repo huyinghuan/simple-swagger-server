@@ -1,0 +1,48 @@
+name: Release
+run-name: Release
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  build:
+    name: Build
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # See: https://goreleaser.com/ci/actions/
+
+      - name: Set up Go 1.21.0
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21.0
+
+      - name: Build
+        run: go build -o swagger-server.bin
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用默认的 GitHub Token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./swagger-server.bin
+          asset_name: swagger-server.bin
+          asset_content_type: application/octet-stream
