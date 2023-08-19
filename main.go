@@ -75,6 +75,19 @@ func NewApp(docsDir string) *gin.Engine {
 		}
 		ctx.JSON(200, gin.H{"message": "上传成功"})
 	})
+	router.DELETE("/api/delete", func(ctx *gin.Context) {
+		data := map[string]string{}
+		ctx.BindJSON(&data)
+		url := data["url"]
+		url = strings.Replace(url, "..", "", -1)
+		url = strings.Replace(url, "/docs/", "", 1)
+		filePath := path.Join(defaultDocsDir, url)
+		if err := os.Remove(filePath); err != nil {
+			ctx.JSON(501, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(200, gin.H{"message": "删除成功"})
+	})
 	router.GET("/*filepath", func(ctx *gin.Context) {
 		file := ctx.Param("filepath")
 		file = strings.Replace(file, "..", "", -1)
