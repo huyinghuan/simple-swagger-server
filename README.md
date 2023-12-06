@@ -18,4 +18,17 @@ chmod +x swagger-server.bin
 ```
 --port 8080 #指定服务端口
 --docs mydocs #指定swagger服务配置文件目录
+--auth password #指定swagger服务的访问密码
+```
+
+### 命令行上传
+    
+```bash
+curl -X POST -H "Content-Type: multipart/form-data" -F "file=@user.json" http://ip:port/api/upload
+```
+
+如果有认证密码:
+
+```bash
+curl -X POST -H "Content-Type: multipart/form-data" -F "file=@user.json" "http://ip:port/api/upload?token=password"
 ```
