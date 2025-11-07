@@ -78,7 +78,7 @@ func authMiddleware(auth string) gin.HandlerFunc {
 var html string
 
 func NewApp(docsDir string, auth string) *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 	authFn := authMiddleware(auth)
 	router.Use(gin.Recovery())
 	router.POST("/api/docs", authFn, func(ctx *gin.Context) {
