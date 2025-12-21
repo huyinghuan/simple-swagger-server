@@ -77,7 +77,7 @@ func authMiddleware(auth string) gin.HandlerFunc {
 //go:embed login.html
 var html string
 
-func NewApp(docsDir string, auth string) *gin.Engine {
+func NewApp(docsDir string, auth string, domain string) *gin.Engine {
 	router := gin.Default()
 	authFn := authMiddleware(auth)
 	router.Use(gin.Recovery())
@@ -114,7 +114,7 @@ func NewApp(docsDir string, auth string) *gin.Engine {
 			ctx.JSON(401, gin.H{"error": "认证失败"})
 			return
 		}
-		ctx.SetCookie("token", token, 3600*24*30, "/", "", false, true)
+		ctx.SetCookie("token", token, 3600*24*30, "/", domain, false, true)
 		ctx.JSON(200, gin.H{"message": "登录成功", "success": true})
 	})
 	router.DELETE("/api/delete", authFn, func(ctx *gin.Context) {
@@ -165,15 +165,17 @@ func main() {
 	var port string
 	var docsDir string
 	var auth string
+	var domain string
 	flag.StringVar(&port, "port", "8888", "端口号")
 	flag.StringVar(&docsDir, "docs", "docs", "文档目录")
 	flag.StringVar(&auth, "auth", "", "简单的认证,不填不认证")
+	flag.StringVar(&domain, "domain", "", "绑定的域名，可以为空")
 	flag.Parse()
 
 	if port == "" {
 		log.Fatal("端口不能为空,启动时需添加参数,如: --port 8888 ")
 	}
-	app := NewApp(docsDir, auth)
+	app := NewApp(docsDir, auth, domain)
 	log.Println("listen on port:", port)
 	app.Run(":" + port)
 }
