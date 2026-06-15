@@ -15,6 +15,8 @@ import (
 	"github.com/huyinghuan/simple-swagger-server/static"
 )
 
+const tokenCookieName = "token"
+
 func findJSONFiles(dirPath string) (map[string]string, error) {
 	filesMap := make(map[string]string)
 
@@ -60,9 +62,9 @@ func authMiddleware(auth string) gin.HandlerFunc {
 			ctx.Next()
 			return
 		}
-		token := ctx.Query("token")
+		token := ctx.Query(tokenCookieName)
 		if token == "" {
-			token, _ = ctx.Cookie("token")
+			token, _ = ctx.Cookie(tokenCookieName)
 		}
 		if token != auth {
 			//	ctx.JSON(401, gin.H{"error": "认证失败"})
@@ -108,13 +110,13 @@ func NewApp(docsDir string, auth string, domain string) *gin.Engine {
 	router.POST("/api/login", func(ctx *gin.Context) {
 		var data map[string]string
 		ctx.BindJSON(&data)
-		token := data["token"]
+		token := data[tokenCookieName]
 
 		if token != auth {
 			ctx.JSON(401, gin.H{"error": "认证失败"})
 			return
 		}
-		ctx.SetCookie("token", token, 3600*24*30, "/", domain, false, true)
+		ctx.SetCookie(tokenCookieName, token, 3600*24*30, "/", domain, false, true)
 		ctx.JSON(200, gin.H{"message": "登录成功", "success": true})
 	})
 	router.DELETE("/api/delete", authFn, func(ctx *gin.Context) {
