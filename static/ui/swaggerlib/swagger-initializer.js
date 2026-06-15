@@ -8,7 +8,7 @@ window.onload = () => {
     var urls = []
     Object.keys(data).forEach((key) => {
       urls.push({
-        url: "/docs/" + data[key],
+        url: "/docs/" + data[key] + "?t="+Date.now(),
         name: key
       })
     })
